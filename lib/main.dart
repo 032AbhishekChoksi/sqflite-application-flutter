@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite_application/sql_helper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Map<String, dynamic>> studList = [];
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+
+  Future<void> getStudentList()async{
+    final data = await SQLHelper.getList();
+    setState(() {
+      studList = data;
+    });
+  }
+
+  @override
+  void initState() {
+    getStudentList();
+  }
 
   @override
   Widget build(BuildContext context) {
