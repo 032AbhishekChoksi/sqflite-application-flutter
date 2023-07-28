@@ -36,47 +36,55 @@ class _MyHomePageState extends State<MyHomePage> {
 
   showForm(int? id) async {
     if (id != null) {
-      final existingrecord =
+      final existingRecord =
           studList.firstWhere((element) => element['id'] == id);
-      nameController.text = existingrecord['name'];
-      emailController.text = existingrecord['email'];
+      nameController.text = existingRecord['name'];
+      emailController.text = existingRecord['email'];
     }
 
     showModalBottomSheet(
-        context: context,
-        elevation: 5,
-        isScrollControlled: true,
-        builder: (context) => Container(
-            padding: EdgeInsets.only(
-              top: 15,
-              left: 15,
-              right: 15,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          top: 15,
+          left: 15,
+          right: 15,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Enter Name'),
+              keyboardType: TextInputType.name,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Enter Name'),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(labelText: 'Enter Email'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text(id == null ? 'Create New' : 'Update'),
-                ),
-              ],
-            )));
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Enter Email'),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (id == null) {
+                  await addStudents();
+                }
+              },
+              child: Text(id == null ? 'Create New' : 'Update'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> getStudentList() async {
@@ -84,6 +92,16 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       studList = data;
     });
+  }
+
+  Future<void> addStudents() async {
+    final id = await SQLHelper.addStudent(
+        nameController.text.toString(), emailController.text.toString());
+    if (id > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Student Inserted Successfully')));
+    }
+    getStudentList();
   }
 
   @override
@@ -112,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.lightBlueAccent,
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
-                  title: studList[index]['name'],
+                  title: Text(studList[index]['name']),
                   subtitle: Text(studList[index]['email']),
                   trailing: SizedBox(
                     width: 100,
