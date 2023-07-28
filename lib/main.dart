@@ -81,6 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (id != null) {
                   await updateStudent(id);
                 }
+                nameController.clear();
+                emailController.clear();
                 //close the bottom sheet
                 Navigator.of(context).pop();
               },
@@ -116,6 +118,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Student Updated Successfully')));
     }
+    getStudentList();
+  }
+
+  Future<void> deleteStudent(int id) async {
+    SQLHelper.deleteStudent(id);
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Student Deleted Successfully')));
     getStudentList();
   }
 
@@ -155,7 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () => showForm(studList[index]['id']),
                             icon: const Icon(Icons.edit)),
                         IconButton(
-                            onPressed: () {}, icon: const Icon(Icons.delete))
+                            onPressed: () =>
+                                deleteStudent(studList[index]['id']),
+                            icon: const Icon(Icons.delete))
                       ],
                     ),
                   ),
