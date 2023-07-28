@@ -78,6 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (id == null) {
                   await addStudents();
                 }
+                if (id != null) {
+                  await updateStudent(id);
+                }
+                //close the bottom sheet
+                Navigator.of(context).pop();
               },
               child: Text(id == null ? 'Create New' : 'Update'),
             ),
@@ -100,6 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
     if (id > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Student Inserted Successfully')));
+    }
+    getStudentList();
+  }
+
+  Future<void> updateStudent(int id) async {
+    final result = await SQLHelper.updateStudent(
+        id, nameController.text.toString(), emailController.text.toString());
+    if (result > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Student Updated Successfully')));
     }
     getStudentList();
   }
