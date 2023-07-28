@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Flutter SQL Lite App',
       theme: ThemeData(
         useMaterial3: true,
       ),
@@ -34,7 +34,52 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-  Future<void> getStudentList()async{
+  showForm(int? id) async {
+    if (id != null) {
+      final existingrecord =
+          studList.firstWhere((element) => element['id'] == id);
+      nameController.text = existingrecord['name'];
+      emailController.text = existingrecord['email'];
+    }
+
+    showModalBottomSheet(
+        context: context,
+        elevation: 5,
+        isScrollControlled: true,
+        builder: (context) => Container(
+            padding: EdgeInsets.only(
+              top: 15,
+              left: 15,
+              right: 15,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Enter Name'),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Enter Email'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text(id == null ? 'Create New' : 'Update'),
+                ),
+              ],
+            )));
+  }
+
+  Future<void> getStudentList() async {
     final data = await SQLHelper.getList();
     setState(() {
       studList = data;
@@ -50,11 +95,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  const Text('SQL Lite App',style: TextStyle(fontSize: 25,fontWeight: FontWeight.w600,color: Colors.black),),
+        title: const Text(
+          'SQL Lite App',
+          style: TextStyle(
+              fontSize: 25, fontWeight: FontWeight.w600, color: Colors.black),
+        ),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      floatingActionButton:
-          FloatingActionButton(onPressed: () {},backgroundColor: Colors.lightBlueAccent, child: const Icon(Icons.add,color: Colors.black)),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () => showForm(null),
+          backgroundColor: Colors.lightBlueAccent,
+          child: const Icon(Icons.add, color: Colors.black)),
       body: ListView.builder(
           itemCount: studList.length,
           itemBuilder: (context, index) => Card(
@@ -68,7 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Row(
                       children: [
                         IconButton(
-                            onPressed: () {}, icon: const Icon(Icons.edit)),
+                            onPressed: () => showForm(studList[index]['id']),
+                            icon: const Icon(Icons.edit)),
                         IconButton(
                             onPressed: () {}, icon: const Icon(Icons.delete))
                       ],
